@@ -117,7 +117,7 @@ class Travel:
 		Returns this travel plan as String in a human readable form
 		:return: String
 		"""
-		out = "Traveling from {} to {}\n".format(self.flights[0].source_code, self.last_flight.destination_code)
+		out = "Travelling from {} to {}\n".format(self.flights[0].source_code, self.last_flight.destination_code)
 		out += "    > departure: {}\n".format(StringParser.datetime_to_string(self.flights[0].departure))
 		out += "    > arrival: {}\n".format(StringParser.datetime_to_string(self.last_flight.arrival))
 		out += "    > bags: {}\n".format(self.BAGS)
