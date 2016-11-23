@@ -13,3 +13,4 @@
 
 ## Řešení
 Zadání jsem vyřešil pomocí vhodně rozvržených datových struktur a pomocí algoritmu hledání do šířky.
+Řešení je realizováno pomocí Pythonu 3.5.2
