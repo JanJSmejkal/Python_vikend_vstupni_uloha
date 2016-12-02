@@ -9,12 +9,11 @@ from src.services.std_com import STD_com
 from src.services.stringParser import StringParser
 from src.services.infrastructureManager import InfrastructureManager
 
-import getopt
-import sys
+import argparse
 from datetime import timedelta
 
 
-def process_arguments(argv):
+def process_arguments():
 	"""
 	Processes given arguments and returns settings dict
 	:param argv: [String]
@@ -33,39 +32,22 @@ def process_arguments(argv):
 		"max_wait_time": timedelta(hours=4),
 	}
 
-	usage = "find_combinations.py [-d | --debug] [-o | --output_type] <output type> \n\n"
-	usage += "{:<30}{:<50}\n".format("-d, --debug", "inputs are loaded from internal file and not from command line")
-	usage += "{:<30}{:<50}\n".format("-o, --output_type", "switch output type/style")
-	usage += "{:<30}{:<50}\n".format(" ", "- possible values: "+", ".join(list(settings["output_type_values"].keys())))
+	parser = argparse.ArgumentParser()
+	parser.add_argument("-d", "--debug", type=bool, default=False, help="inputs are loaded from internal file and not from command line")
+	parser.add_argument("-o", "--output_type", type=str, default="min_json", help="switch output type/style, possible values: " + ",".join(list(settings["output_type_values"].keys())))
 
-	try:
-		opts, args = getopt.getopt(argv, "hdo:", ["debug", "output_type="])
-	except getopt.GetoptError:
-		STD_com.print_stdout(usage)
-		sys.exit(2)
+	args = parser.parse_args()
 
-	for opt, arg in opts:
-		if opt == "-h":
-			STD_com.print_stdout(usage)
-			sys.exit(0)
-		elif opt in ("-d", "--debug"):
-			settings["debug"] = True
-		elif opt in ("-o", "--output_type"):
-			if arg in settings["output_type_values"]:
-				settings["output_type"] = arg
-			else:
-				STD_com.print_stderr("{} is unsupported value for output type!".format(arg))
-				STD_com.print_stdout(usage)
-				sys.exit(2)
+	settings["debug"] = True
+	if args.output_type in settings["output_type_values"]:
+		settings["output_type"] = args.output_type
+
 	return settings
 
 
 def main(settings):
 	# Loading data
-	if settings["debug"]:
-		file = STD_com.file_from_path("input.csv")
-	else:
-		file = STD_com.file_from_stdin()
+	file = STD_com.file_from_path("input.csv") if settings["debug"] else STD_com.file_from_stdin()
 
 	# Parsing loaded data to objects
 	flights = StringParser.file_to_flights(file)
@@ -83,5 +65,5 @@ def main(settings):
 			STD_com.print_stdout(eval("t."+settings["output_type_values"][settings["output_type"]]))
 
 if __name__ == "__main__":
-	loaded_settings = process_arguments(sys.argv[1:])
+	loaded_settings = process_arguments()
 	main(loaded_settings)
